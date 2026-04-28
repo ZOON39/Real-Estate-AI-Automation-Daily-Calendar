@@ -1,0 +1,226 @@
+
+<h2 class="sr-only">8-week day-by-day learning calendar for AI automation and real estate social media</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.cal-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 0 1.5rem}
+.cal-header h1{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.week-nav{display:flex;gap:6px;flex-wrap:wrap}
+.week-btn{font-size:12px;padding:4px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-secondary);cursor:pointer;transition:all .15s}
+.week-btn.active{background:#EEEDFE;border-color:#534AB7;color:#3C3489}
+.week-btn:hover:not(.active){background:var(--color-background-secondary)}
+.phase-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:var(--border-radius-md);margin-bottom:1rem;display:inline-block}
+.phase-1{background:#EEEDFE;color:#3C3489}
+.phase-2{background:#E1F5EE;color:#085041}
+.phase-3{background:#FAEEDA;color:#633806}
+.phase-4{background:#FAECE7;color:#712B13}
+.days-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1rem}
+.day-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px;min-height:180px;display:flex;flex-direction:column;gap:8px}
+.day-card.rest{background:var(--color-background-secondary);border-style:dashed;opacity:0.7}
+.day-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.04em}
+.day-title{font-size:13px;font-weight:500;color:var(--color-text-primary);line-height:1.4}
+.day-task{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.day-link{font-size:11px;padding:5px 8px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);color:var(--color-text-info);text-decoration:none;display:block;margin-top:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day-link:hover{background:var(--color-background-info);border-color:var(--color-border-info)}
+.day-link-label{font-size:10px;color:var(--color-text-tertiary);margin-top:4px}
+.weekend-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.5rem}
+.progress-bar{height:4px;background:var(--color-background-secondary);border-radius:2px;margin-bottom:1.5rem}
+.progress-fill{height:100%;border-radius:2px;background:#534AB7;transition:width .3s}
+.week-summary{font-size:13px;color:var(--color-text-secondary);padding:10px 14px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-bottom:1rem;line-height:1.6}
+.check-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.check-box{width:14px;height:14px;border:0.5px solid var(--color-border-secondary);border-radius:3px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
+.check-box.done{background:#534AB7;border-color:#534AB7;color:#fff}
+.check-label{font-size:12px;color:var(--color-text-secondary)}
+.day-links-group{display:flex;flex-direction:column;gap:4px;margin-top:auto}
+</style>
+
+<div class="cal-header">
+  <h1>Your 8-week learning calendar</h1>
+  <div class="week-nav" id="weekNav"></div>
+</div>
+
+<div id="progressBar" class="progress-bar"><div class="progress-fill" id="progressFill" style="width:12.5%"></div></div>
+
+<div id="phaseBadge" class="phase-badge phase-1">Phase 1 — Learn</div>
+<div id="weekSummary" class="week-summary"></div>
+<div id="daysGrid" class="days-grid"></div>
+<div id="weekendRow" class="weekend-row"></div>
+
+<div id="checklistSection" style="margin-top:1rem;padding:12px 14px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)">
+  <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:10px">Weekly goals checklist</div>
+  <div id="checklistItems"></div>
+</div>
+
+<script>
+const weeks = [
+  {
+    label:"Week 1",phase:1,phaseLabel:"Phase 1 — Learn",phaseClass:"phase-1",
+    summary:"Focus: Get comfortable with AI. Learn how Claude works, practice writing real estate prompts, and start studying what real estate content looks like on Facebook.",
+    days:[
+      {day:"Mon",title:"Set up Claude.ai",task:"Create free account. Explore the interface. Send your first prompt.",link:"https://www.youtube.com/watch?v=-xEF5WrdIWs",linkLabel:"Claude Tutorial for Beginners (2026)"},
+      {day:"Tue",title:"Learn prompt basics",task:"Practice writing clear, specific prompts. Ask Claude to write a property description.",link:"https://www.youtube.com/watch?v=WSPChlfxJyA",linkLabel:"Full Claude Tutorial: Beginner to Advanced"},
+      {day:"Wed",title:"Real estate terms",task:"Learn 15 key PH real estate terms: RFO, pre-selling, condominium, turnover, etc. Ask Claude to explain each.",link:"https://www.housingwire.com/articles/chatgpt-for-real-estate/",linkLabel:"AI Prompts for Real Estate Agents"},
+      {day:"Thu",title:"Study real estate content",task:"Follow 10 PH real estate Facebook pages. Screenshot 5 posts you like and note what makes them work.",link:"https://www.mckissock.com/blog/real-estate/real-estate-social-media-marketing-best-practices/",linkLabel:"Real Estate Social Media Strategy Guide"},
+      {day:"Fri",title:"Practice AI captions",task:"Use Claude to write 5 property listing captions. Try different tones: luxury, affordable, family-friendly.",link:"https://www.gbreb.com/GBAR/Sites/GBAR/News/Agent_Insider/2023/40_Game_Changing_ChatGPT_Prompts_Every_Agent_Should_Use.aspx",linkLabel:"40 Real Estate AI Prompts to Practice"},
+    ],
+    goals:["Create Claude.ai free account","Write 5 property captions using AI","Learn 15 real estate terms","Follow 10 PH real estate pages on Facebook"]
+  },
+  {
+    label:"Week 2",phase:1,phaseLabel:"Phase 1 — Learn",phaseClass:"phase-1",
+    summary:"Focus: Learn Make.com from scratch. Understand how automation workflows work and connect your first apps together.",
+    days:[
+      {day:"Mon",title:"Set up Make.com",task:"Create free account. Watch the first 30 min of the 2-hour beginner guide. Explore the interface.",link:"https://www.youtube.com/live/MpmpC4C5fZs",linkLabel:"Master Make.com in 2 Hours (2025)"},
+      {day:"Tue",title:"Understand scenarios",task:"Learn what triggers, actions, and modules are. Build a simple 2-step test scenario.",link:"https://www.youtube.com/watch?v=DS4QbTpbVKw",linkLabel:"Make.com: Zero to Advanced in One Video"},
+      {day:"Wed",title:"Connect Google Sheets",task:"Create a Google Sheet for fake property listings. Connect it to Make.com as a data source.",link:"https://www.youtube.com/watch?v=YPZ9gEl2uvs",linkLabel:"Make.com: Automate Google Sheets"},
+      {day:"Thu",title:"Learn filters & routing",task:"Watch the second half of the 2-hour Make.com guide. Learn filters, routers, and error handling.",link:"https://www.youtube.com/live/MpmpC4C5fZs",linkLabel:"Master Make.com in 2 Hours (continue)"},
+      {day:"Fri",title:"Build test workflow",task:"Build a simple scenario: When a row is added to Google Sheets → Send yourself an email notification.",link:"https://www.youtube.com/watch?v=DYe_hvpfAho",linkLabel:"Make.com Automation Tutorial 2025"},
+    ],
+    goals:["Create Make.com free account","Understand triggers and actions","Connect Google Sheets to Make.com","Build and test your first simple scenario"]
+  },
+  {
+    label:"Week 3",phase:1,phaseLabel:"Phase 1 — Learn",phaseClass:"phase-1",
+    summary:"Focus: Connect AI + automation together. Build your first real workflow where property details go in and AI captions come out.",
+    days:[
+      {day:"Mon",title:"Create Google Form",task:"Build a Google Form for property details: property name, location, price, features, bedrooms, bathrooms.",link:"https://www.youtube.com/watch?v=MUh_jZJ_YgA",linkLabel:"Make.com: Google Forms + AI Workflow"},
+      {day:"Tue",title:"Connect Form to Make.com",task:"Link your Google Form responses to Make.com. Test that new responses trigger your scenario.",link:"https://www.youtube.com/watch?v=MUh_jZJ_YgA",linkLabel:"Make.com: Google Forms + AI Workflow"},
+      {day:"Wed",title:"Add AI to workflow",task:"Add an AI module to your Make.com scenario. Send property details to Claude/ChatGPT and receive a caption.",link:"https://www.youtube.com/playlist?list=PLovQO5A2IgJVp4vMxmSkgI_yIi85hrPEE",linkLabel:"Make.com Full Tutorial Playlist"},
+      {day:"Thu",title:"Output to Google Sheets",task:"Save the AI-generated caption back into a Google Sheet column. Test the full loop end to end.",link:"https://www.youtube.com/watch?v=YPZ9gEl2uvs",linkLabel:"Make.com: Automate Google Sheets"},
+      {day:"Fri",title:"Test & refine prompt",task:"Submit 3 fake property listings through your form. Improve your AI prompt until captions are great.",link:"https://www.gbreb.com/GBAR/Sites/GBAR/News/Agent_Insider/2023/40_Game_Changing_ChatGPT_Prompts_Every_Agent_Should_Use.aspx",linkLabel:"Real Estate AI Prompts Reference"},
+    ],
+    goals:["Build Google Form for property details","Connect Form → Make.com → AI","AI generates captions automatically","Test with 3 fake property listings"]
+  },
+  {
+    label:"Week 4",phase:2,phaseLabel:"Phase 2 — Build",phaseClass:"phase-2",
+    summary:"Focus: Design your Canva template library. This is where your graphic design skills shine. Create 5 branded templates for a fake real estate agent.",
+    days:[
+      {day:"Mon",title:"Create fake agent brand",task:"Invent a fake agent: name, tagline, color palette, fonts. Create a Canva brand kit.",link:"https://www.canva.com/templates/s/real-estate/",linkLabel:"Canva Real Estate Templates Library"},
+      {day:"Tue",title:"Design listing template",task:"Create your property listing post template. Include photo area, price, location, features, agent logo.",link:"https://www.youtube.com/watch?v=BMubAttN82I",linkLabel:"Canva for Real Estate Professionals"},
+      {day:"Wed",title:"Design tip post template",task:"Create a real estate tips carousel template. 5 slides: cover, 3 tips, CTA. Use consistent brand colors.",link:"https://www.youtube.com/watch?v=NI5xdqhm5vM",linkLabel:"Top Canva Templates for Real Estate"},
+      {day:"Thu",title:"Design testimonial + CTA",task:"Create a client testimonial template and a call-to-action post template. Keep brand consistent.",link:"https://buildingbetteragents.com/a-step-by-step-guide-to-using-canva-for-real-estate-social-media-branding/",linkLabel:"Canva Real Estate Branding Guide"},
+      {day:"Fri",title:"Design promo template",task:"Create a promotional post template (e.g. open house, price drop). Complete your 5-template set.",link:"https://www.canva.com/learn/real-estate-social-ideas/",linkLabel:"Canva Real Estate Social Media Ideas"},
+    ],
+    goals:["Invent fake agent brand identity","Create 5 Canva templates","Set up Canva brand kit","Templates look consistent and professional"]
+  },
+  {
+    label:"Week 5",phase:2,phaseLabel:"Phase 2 — Build",phaseClass:"phase-2",
+    summary:"Focus: Build your full system and create a live fake agent social media account. Post real content using your AI + Canva + scheduling workflow.",
+    days:[
+      {day:"Mon",title:"Set up Buffer",task:"Create free Buffer account. Connect a Facebook page and Instagram account for your fake agent.",link:"https://www.youtube.com/watch?v=v1lHFqj3r6k",linkLabel:"How to Use Buffer 2025 (Complete Tutorial)"},
+      {day:"Tue",title:"Create fake agent page",task:"Create a Facebook page for your fake real estate agent. Fill in bio, profile photo, cover photo using Canva.",link:"https://www.youtube.com/watch?v=XJ8XiDI2jck",linkLabel:"Buffer: Step by Step for Beginners"},
+      {day:"Wed",title:"Connect Make.com to Buffer",task:"Add Buffer as the final step in your Make.com workflow. Form → AI caption → Buffer scheduling.",link:"https://www.youtube.com/playlist?list=PLovQO5A2IgJVp4vMxmSkgI_yIi85hrPEE",linkLabel:"Make.com Full Tutorial Playlist"},
+      {day:"Thu",title:"Submit first 3 listings",task:"Fill in your Google Form 3 times with fake property details. Watch the full workflow run automatically.",link:"https://www.youtube.com/watch?v=MUh_jZJ_YgA",linkLabel:"Make.com: Google Forms + AI Workflow"},
+      {day:"Fri",title:"Add Canva graphics",task:"Take the AI captions from Buffer, pair them with your Canva templates, and schedule 3 posts for next week.",link:"https://www.youtube.com/playlist?list=PLzWGUATMdSthlw37epNmrP2SHlctEDRIJ",linkLabel:"Buffer Official Getting Started 2026"},
+    ],
+    goals:["Create fake agent Facebook page","Buffer connected and scheduling posts","Full workflow running end-to-end","3 posts scheduled and ready to go live"]
+  },
+  {
+    label:"Week 6",phase:2,phaseLabel:"Phase 2 — Build",phaseClass:"phase-2",
+    summary:"Focus: Refine your system and add a second content type. Document everything — screenshots, screen recordings — this becomes your portfolio evidence.",
+    days:[
+      {day:"Mon",title:"Post review",task:"Review the 3 posts that went live. Note what looks good and what needs improvement. Tweak templates if needed.",link:"https://www.canva.com/learn/real-estate-social-ideas/",linkLabel:"Real Estate Content Ideas (Canva)"},
+      {day:"Tue",title:"Build tips automation",task:"Build a second workflow: real estate tips content. AI generates a tip post → Canva template → Buffer.",link:"https://www.youtube.com/watch?v=DS4QbTpbVKw",linkLabel:"Make.com: Zero to Advanced in One Video"},
+      {day:"Wed",title:"Schedule 2 weeks of posts",task:"Use your workflow to create and schedule 10–14 posts. Mix listings, tips, and testimonials.",link:"https://www.youtube.com/playlist?list=PLzWGUATMdSthlw37epNmrP2SHlctEDRIJ",linkLabel:"Buffer Official Getting Started 2026"},
+      {day:"Thu",title:"Record your workflow",task:"Record a 2–3 min screen recording of your full automation running. This is your portfolio proof.",link:"https://www.youtube.com/watch?v=v1lHFqj3r6k",linkLabel:"How to Use Buffer 2025"},
+      {day:"Fri",title:"Document results",task:"Write down: how many posts you created, time it took, vs doing it manually. This is your case study data.",link:"https://blog.hootsuite.com/social-media-portfolio/",linkLabel:"How to Build a Social Media Portfolio"},
+    ],
+    goals:["2 weeks of content scheduled and live","Screen recording of automation workflow","Before/after time comparison documented","Second content type (tips) automated"]
+  },
+  {
+    label:"Week 7",phase:3,phaseLabel:"Phase 3 — Portfolio",phaseClass:"phase-3",
+    summary:"Focus: Package everything into a shareable portfolio. Turn your fake agent project into a professional case study that real clients can see.",
+    days:[
+      {day:"Mon",title:"Choose portfolio platform",task:"Set up a free Notion page or Google Site. This will be your portfolio. Keep it simple and clean.",link:"https://blog.hootsuite.com/social-media-portfolio/",linkLabel:"How to Build a Social Media Portfolio"},
+      {day:"Tue",title:"Write your case study",task:"Document your fake agent project: Problem → Solution → Result. Include screenshots of posts and workflow.",link:"https://www.bigcatcreative.com/blog/build-design-portfolio",linkLabel:"Build a Portfolio Without Real Clients"},
+      {day:"Wed",title:"Add your system overview",task:"Write a simple 1-page explanation of what your service includes. Add a diagram of your workflow.",link:"https://blog.copyfol.io/social-media-portfolio",linkLabel:"Social Media Portfolio Examples"},
+      {day:"Thu",title:"Add screenshots and video",task:"Embed your screen recording, screenshots of scheduled posts, and before/after time comparison.",link:"https://www.journoportfolio.com/blog/how-to-build-a-social-media-portfolio/",linkLabel:"Social Media Portfolio Tips + Examples"},
+      {day:"Fri",title:"Design portfolio page",task:"Use your design skills to make the portfolio page look clean and professional. Add contact info.",link:"https://www.bigcatcreative.com/blog/build-design-portfolio",linkLabel:"Build a Portfolio Without Real Clients"},
+    ],
+    goals:["Portfolio page live and shareable","Case study written with screenshots","Screen recording embedded","Portfolio looks professional (use design skills!)"]
+  },
+  {
+    label:"Week 8",phase:3,phaseLabel:"Phase 3 — Portfolio",phaseClass:"phase-3",
+    summary:"Focus: Find and reach out to free clients. Use your portfolio as proof. Land 1–2 real estate agents who will let you run your system for them at no cost.",
+    days:[
+      {day:"Mon",title:"Find agents on Facebook",task:"Search PH real estate Facebook groups. Identify 10–15 active agents who post inconsistently.",link:"https://www.mckissock.com/blog/real-estate/real-estate-social-media-marketing-best-practices/",linkLabel:"Real Estate Social Media Strategy Guide"},
+      {day:"Tue",title:"Write your outreach message",task:"Write a short, honest DM: introduce yourself, offer free 30-day trial, share portfolio link. Keep it brief.",link:"https://blog.hootsuite.com/social-media-portfolio/",linkLabel:"Social Media Portfolio Tips"},
+      {day:"Wed",title:"Send first 5 DMs",task:"Send your message to 5 agents. Be honest that you're building your portfolio. No pressure pitch.",link:"https://www.bigcatcreative.com/blog/build-design-portfolio",linkLabel:"Build Portfolio Without Clients Guide"},
+      {day:"Thu",title:"Send 5 more DMs",task:"Send 5 more outreach messages. Follow up on any replies from Wednesday with more info.",link:"https://www.journoportfolio.com/blog/how-to-build-a-social-media-portfolio/",linkLabel:"Social Media Portfolio Guide"},
+      {day:"Fri",title:"Review and refine pitch",task:"Review all replies. Refine your message based on what got responses. Prepare onboarding for new client.",link:"https://www.canva.com/learn/real-estate-social-ideas/",linkLabel:"Real Estate Content Ideas (Canva)"},
+    ],
+    goals:["Sent 10+ outreach DMs to real estate agents","At least 1–2 agents said yes","Onboarding process prepared","Ready to start serving your first free client"]
+  }
+];
+
+let currentWeek = 0;
+const checks = {};
+
+function renderWeekNav(){
+  const nav = document.getElementById('weekNav');
+  nav.innerHTML = '';
+  weeks.forEach((w,i)=>{
+    const b = document.createElement('button');
+    b.className = 'week-btn' + (i===currentWeek?' active':'');
+    b.textContent = w.label;
+    b.onclick = ()=>{currentWeek=i;render()};
+    nav.appendChild(b);
+  });
+}
+
+function renderWeek(){
+  const w = weeks[currentWeek];
+  document.getElementById('progressFill').style.width = ((currentWeek+1)/8*100)+'%';
+  document.getElementById('phaseBadge').textContent = w.phaseLabel;
+  document.getElementById('phaseBadge').className = 'phase-badge '+w.phaseClass;
+  document.getElementById('weekSummary').textContent = w.summary;
+
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = '';
+  w.days.forEach(d=>{
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    card.innerHTML = `
+      <div class="day-label">${d.day}</div>
+      <div class="day-title">${d.title}</div>
+      <div class="day-task">${d.task}</div>
+      <div class="day-links-group">
+        <a class="day-link" href="${d.link}" target="_blank">Watch / Read</a>
+        <div class="day-link-label">${d.linkLabel}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  const wr = document.getElementById('weekendRow');
+  wr.innerHTML = `
+    <div class="day-card rest">
+      <div class="day-label">Sat</div>
+      <div class="day-title">Rest day</div>
+      <div class="day-task">Take a break. You've worked hard all week. Rest is part of the process.</div>
+    </div>
+    <div class="day-card rest">
+      <div class="day-label">Sun</div>
+      <div class="day-title">Optional review</div>
+      <div class="day-task">Optionally review the week's work or watch 1 extra tutorial if you feel behind. Never skip rest entirely.</div>
+    </div>`;
+
+  const cl = document.getElementById('checklistItems');
+  cl.innerHTML = '';
+  w.goals.forEach((g,i)=>{
+    const key = `w${currentWeek}_g${i}`;
+    if(!checks[key]) checks[key]=false;
+    const row = document.createElement('div');
+    row.className='check-row';
+    const box = document.createElement('div');
+    box.className='check-box'+(checks[key]?' done':'');
+    box.textContent = checks[key]?'✓':'';
+    box.onclick=()=>{checks[key]=!checks[key];render()};
+    const lbl = document.createElement('div');
+    lbl.className='check-label';
+    lbl.textContent=g;
+    row.appendChild(box);row.appendChild(lbl);
+    cl.appendChild(row);
+  });
+}
+
+function render(){renderWeekNav();renderWeek();}
+render();
+</script>
